@@ -8,6 +8,7 @@ tqdm
 tb-nightly
 future
 Pillow
+pandas
 
 # Equivalent conda commands ----------------------------------------------------
 # conda update -n base -c defaults conda
