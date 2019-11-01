@@ -19,11 +19,10 @@ RUN pip install torch==1.3.0+cpu torchvision==0.4.1+cpu -f https://download.pyto
 COPY ./cfg ./cfg
 COPY ./data ./data
 COPY ./utils ./utils
-COPY application.py .
 COPY detect.py .
 COPY models.py .
 COPY server.py .
 
 # Start Server
 EXPOSE 3000
-ENTRYPOINT ["python", "./server.py"]
+CMD ["gunicorn", "-b", "0.0.0.0:3000", "server:app"]

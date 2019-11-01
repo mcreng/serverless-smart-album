@@ -9,7 +9,7 @@ from utils.utils import *
 def detect(opt, images, save_txt=False, save_img=False):
     # (320, 192) or (416, 256) or (608, 352) for (height, width)
     img_size = (320, 192) if ONNX_EXPORT else opt.img_size
-    out, source, weights, half, view_img = opt.output, opt.source, opt.weights, opt.half, opt.view_img
+    weights, half = opt.weights, opt.half
 
     # Initialize
     device = torch_utils.select_device(

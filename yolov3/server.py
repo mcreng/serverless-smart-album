@@ -1,16 +1,30 @@
 from timeit import default_timer as timer
+import argparse
 
 import flask
 from flask import request, send_file, jsonify
 
 import cv2
 import numpy as np
-from datauri import DataURI
+import torch
 
-from application import server_detect
+from datauri import DataURI
+from detect import detect
 
 app = flask.Flask(__name__)
 
+class Object(object):
+    pass
+
+opt = Object()
+opt.cfg = 'cfg/yolov3-tiny.cfg'
+opt.data = 'data/coco.data'
+opt.weights = 'weights/yolov3-tiny.weights'
+opt.img_size = 416
+opt.conf_thres = 0.3
+opt.nms_thres = 0.5
+opt.half = False
+opt.device = ''
 
 @app.route('/', methods=['GET'])
 def get_pred():
@@ -31,7 +45,8 @@ def get_pred():
         return jsonify([])
     images = list(map(lambda uri: cv2.imdecode(np.frombuffer(
         uri.data, np.uint8), -1), images))  # convert to images
-    json = server_detect(images)
+    with torch.no_grad():
+        json = detect(opt, images)
     end = timer()
     print('Process took {:.2f}s to finish.'.format(end-start))
 
@@ -39,4 +54,4 @@ def get_pred():
 
 
 if __name__ == '__main__':
-    app.run(debug=False, host='0.0.0.0', port=3000)
+    app.run(host='0.0.0.0', port=3000)
