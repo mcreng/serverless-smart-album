@@ -74,6 +74,7 @@ def detect(opt, save_txt=False, save_img=False):
               for _ in range(len(classes))]
 
     # Run inference
+    preds = []
     t0 = time.time()
     for path, img, im0s, vid_cap in dataset:
         t = time.time()
@@ -125,9 +126,9 @@ def detect(opt, save_txt=False, save_img=False):
                                      color=colors[int(cls)])
 
         print('Done. (%.3fs)' % (time.time() - t0))
-
-        df = pd.DataFrame(pred[0].numpy(), columns=['x1', 'y1', 'x2', 'y2', 'conf', 'unk', 'class']).drop(
+        df = pd.DataFrame.from_records(pred[0].numpy(), columns=['x1', 'y1', 'x2', 'y2', 'conf', 'unk', 'class']).drop(
             columns=['unk']).astype(dtype={'x1': 'int', 'y1': 'int', 'x2': 'int', 'y2': 'int'})
         df['class'] = df['class'].map(lambda c: classes[int(c)])
+        preds.append(df.to_dict(orient='records'))
 
-        return df.to_json(orient='records')
+    return preds

@@ -1,4 +1,5 @@
 import argparse
+import json
 
 import torch
 from detect import detect
@@ -34,4 +35,4 @@ if __name__ == '__main__':
     opt = parser.parse_args()
 
     with torch.no_grad():
-        print(detect(opt))
+        print(json.dumps(detect(opt)))
