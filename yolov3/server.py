@@ -13,19 +13,6 @@ from detect import detect
 
 app = flask.Flask(__name__)
 
-class Object(object):
-    pass
-
-opt = Object()
-opt.cfg = 'cfg/yolov3-tiny.cfg'
-opt.data = 'data/coco.data'
-opt.weights = 'weights/yolov3-tiny.weights'
-opt.img_size = 416
-opt.conf_thres = 0.3
-opt.nms_thres = 0.5
-opt.half = False
-opt.device = ''
-
 @app.route('/', methods=['GET'])
 def get_pred():
     """
@@ -46,7 +33,7 @@ def get_pred():
     images = list(map(lambda uri: cv2.imdecode(np.frombuffer(
         uri.data, np.uint8), -1), images))  # convert to images
     with torch.no_grad():
-        json = detect(opt, images)
+        json = detect(images)
     end = timer()
     print('Process took {:.2f}s to finish.'.format(end-start))
 

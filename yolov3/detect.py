@@ -1,57 +1,49 @@
 from sys import platform
 
 import pandas as pd
-from models import *  # set ONNX_EXPORT in models.py
+from models import * 
 from utils.datasets import *
 from utils.utils import *
 
+class Object(object):
+    pass
 
-def detect(opt, images, save_txt=False, save_img=False):
-    # (320, 192) or (416, 256) or (608, 352) for (height, width)
-    img_size = (320, 192) if ONNX_EXPORT else opt.img_size
-    weights, half = opt.weights, opt.half
+opt = Object()
+opt.cfg = 'cfg/yolov3-tiny.cfg'
+opt.data = 'data/coco.data'
+opt.weights = 'weights/yolov3-tiny.weights'
+opt.img_size = 416
+opt.conf_thres = 0.3
+opt.nms_thres = 0.5
+opt.half = False
+opt.device = ''
 
-    # Initialize
-    device = torch_utils.select_device(
-        device='cpu' if ONNX_EXPORT else opt.device)
+# (320, 192) or (416, 256) or (608, 352) for (height, width)
+img_size = opt.img_size
+weights, half = opt.weights, opt.half
 
-    # Initialize model
-    model = Darknet(opt.cfg, img_size)
+# Initialize
+device = torch_utils.select_device(opt.device)
 
-    # Load weights
-    attempt_download(weights)
-    if weights.endswith('.pt'):  # pytorch format
-        model.load_state_dict(torch.load(
-            weights, map_location=device)['model'])
-    else:  # darknet format
-        _ = load_darknet_weights(model, weights)
+# Initialize model
+model = Darknet(opt.cfg, img_size)
 
-    # Second-stage classifier
-    classify = False
-    if classify:
-        modelc = torch_utils.load_classifier(
-            name='resnet101', n=2)  # initialize
-        modelc.load_state_dict(torch.load(
-            'weights/resnet101.pt', map_location=device)['model'])  # load weights
-        modelc.to(device).eval()
+# Load weights
+attempt_download(weights)
+if weights.endswith('.pt'):  # pytorch format
+    model.load_state_dict(torch.load(
+        weights, map_location=device)['model'])
+else:  # darknet format
+    _ = load_darknet_weights(model, weights)
+# Eval mode
+model.to(device).eval()
 
-    # Fuse Conv2d + BatchNorm2d layers
-    # model.fuse()
+# Half precision
+half = half and device.type != 'cpu'  # half precision only supported on CUDA
+if half:
+    model.half()
 
-    # Eval mode
-    model.to(device).eval()
-
-    # Export mode
-    if ONNX_EXPORT:
-        img = torch.zeros((1, 3) + img_size)  # (1, 3, 320, 192)
-        torch.onnx.export(model, img, 'weights/export.onnx', verbose=True)
-        return
-
-    # Half precision
-    half = half and device.type != 'cpu'  # half precision only supported on CUDA
-    if half:
-        model.half()
-
+def detect(images, save_txt=False, save_img=False):
     # Set Dataloader
     dataset = LoadImages(images, img_size=img_size, half=half)
 
@@ -77,10 +69,6 @@ def detect(opt, images, save_txt=False, save_img=False):
 
         # Apply NMS
         pred = non_max_suppression(pred, opt.conf_thres, opt.nms_thres)
-
-        # Apply
-        if classify:
-            pred = apply_classifier(pred, modelc, img, im0s)
 
         # Process detections
         for i, det in enumerate(pred):  # detections per image
