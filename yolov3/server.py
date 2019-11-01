@@ -17,9 +17,9 @@ def get_pred():
     """
     Get /
     Params:
-        time (str): Time in yyyy-mm-ddThh:mm specifying the first image to read. Consequently, the prediction would start after IN_LEN frames from start_datetime.
+        images (list): List of data uri specified images.
     Returns:
-        Prediction in mp4 as specified.
+        Prediction in list of object, each object specifies the the two corners of the bounding box, the confidence level and the prediction.
     """
 
     start = timer()
