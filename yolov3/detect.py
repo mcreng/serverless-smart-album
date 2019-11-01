@@ -6,19 +6,14 @@ from utils.datasets import *
 from utils.utils import *
 
 
-def detect(opt, save_txt=False, save_img=False):
+def detect(opt, images, save_txt=False, save_img=False):
     # (320, 192) or (416, 256) or (608, 352) for (height, width)
     img_size = (320, 192) if ONNX_EXPORT else opt.img_size
     out, source, weights, half, view_img = opt.output, opt.source, opt.weights, opt.half, opt.view_img
-    webcam = source == '0' or source.startswith(
-        'rtsp') or source.startswith('http') or source.endswith('.txt')
 
     # Initialize
     device = torch_utils.select_device(
         device='cpu' if ONNX_EXPORT else opt.device)
-    if os.path.exists(out):
-        shutil.rmtree(out)  # delete output folder
-    os.makedirs(out)  # make new output folder
 
     # Initialize model
     model = Darknet(opt.cfg, img_size)
@@ -58,15 +53,7 @@ def detect(opt, save_txt=False, save_img=False):
         model.half()
 
     # Set Dataloader
-    vid_path, vid_writer = None, None
-    if webcam:
-        view_img = True
-        # set True to speed up constant image size inference
-        torch.backends.cudnn.benchmark = True
-        dataset = LoadStreams(source, img_size=img_size, half=half)
-    else:
-        save_img = True
-        dataset = LoadImages(source, img_size=img_size, half=half)
+    dataset = LoadImages(images, img_size=img_size, half=half)
 
     # Get classes and colors
     classes = load_classes(parse_data_cfg(opt.data)['names'])
@@ -97,12 +84,9 @@ def detect(opt, save_txt=False, save_img=False):
 
         # Process detections
         for i, det in enumerate(pred):  # detections per image
-            if webcam:  # batch_size >= 1
-                p, s, im0 = path[i], '%g: ' % i, im0s[i]
-            else:
-                p, s, im0 = path, '', im0s
+            p, s, im0 = path, '', im0s
 
-            save_path = str(Path(out) / Path(p).name)
+            # save_path = str(Path(out) / Path(p).name)
             s += '%gx%g ' % img.shape[2:]  # print string
             if det is not None and len(det):
                 # Rescale boxes from img_size to im0 size
@@ -113,17 +97,6 @@ def detect(opt, save_txt=False, save_img=False):
                 for c in det[:, -1].unique():
                     n = (det[:, -1] == c).sum()  # detections per class
                     s += '%g %ss, ' % (n, classes[int(c)])  # add to string
-
-                # Write results
-                for *xyxy, conf, _, cls in det:
-                    if save_txt:  # Write to file
-                        with open(save_path + '.txt', 'a') as file:
-                            file.write(('%g ' * 6 + '\n') % (*xyxy, cls, conf))
-
-                    if save_img or view_img:  # Add bbox to image
-                        label = '%s %.2f' % (classes[int(cls)], conf)
-                        plot_one_box(xyxy, im0, label=label,
-                                     color=colors[int(cls)])
 
         print('Done. (%.3fs)' % (time.time() - t0))
         df = pd.DataFrame.from_records(pred[0].numpy(), columns=['x1', 'y1', 'x2', 'y2', 'conf', 'unk', 'class']).drop(

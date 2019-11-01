@@ -1,11 +1,10 @@
 import argparse
-import json
 
 import torch
 from detect import detect
 
 
-if __name__ == '__main__':
+def server_detect(images):
     parser = argparse.ArgumentParser()
     parser.add_argument('--cfg', type=str,
                         default='cfg/yolov3-tiny.cfg', help='cfg file path')
@@ -35,4 +34,4 @@ if __name__ == '__main__':
     opt = parser.parse_args()
 
     with torch.no_grad():
-        print(json.dumps(detect(opt)))
+        return detect(opt, images)
