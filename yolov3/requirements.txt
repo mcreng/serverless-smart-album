@@ -1,15 +1,16 @@
 # pip3 install -U -r requirements.txt
+Cython
 numpy
 opencv-python
-torch >= 1.2
 matplotlib
-pycocotools
 tqdm
 tb-nightly
 future
 Pillow
 pandas
 flask
+python-datauri
+# pycocotools # install seperately.. otherwise pip crashes because it doesn't link Cython and numpy as its dependencies
 
 # Equivalent conda commands ----------------------------------------------------
 # conda update -n base -c defaults conda

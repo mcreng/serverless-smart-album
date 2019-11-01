@@ -1,0 +1,6 @@
+# samples in data/
+data/samples/
+
+# cache folders
+.vscode/
+__pycache__/
