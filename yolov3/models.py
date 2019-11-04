@@ -29,16 +29,20 @@ def create_modules(module_defs, img_size, arc):
                                                    padding=pad,
                                                    bias=not bn))
             if bn:
-                modules.add_module('BatchNorm2d', nn.BatchNorm2d(filters, momentum=0.1))
-            if mdef['activation'] == 'leaky':  # TODO: activation study https://github.com/ultralytics/yolov3/issues/441
-                modules.add_module('activation', nn.LeakyReLU(0.1, inplace=True))
+                modules.add_module(
+                    'BatchNorm2d', nn.BatchNorm2d(filters, momentum=0.1))
+            # TODO: activation study https://github.com/ultralytics/yolov3/issues/441
+            if mdef['activation'] == 'leaky':
+                modules.add_module(
+                    'activation', nn.LeakyReLU(0.1, inplace=True))
                 # modules.add_module('activation', nn.PReLU(num_parameters=1, init=0.10))
                 # modules.add_module('activation', Swish())
 
         elif mdef['type'] == 'maxpool':
             kernel_size = int(mdef['size'])
             stride = int(mdef['stride'])
-            maxpool = nn.MaxPool2d(kernel_size=kernel_size, stride=stride, padding=int((kernel_size - 1) // 2))
+            maxpool = nn.MaxPool2d(
+                kernel_size=kernel_size, stride=stride, padding=int((kernel_size - 1) // 2))
             if kernel_size == 2 and stride == 1:  # yolov3-tiny
                 modules.add_module('ZeroPad2d', nn.ZeroPad2d((0, 1, 0, 1)))
                 modules.add_module('MaxPool2d', maxpool)
@@ -46,11 +50,13 @@ def create_modules(module_defs, img_size, arc):
                 modules = maxpool
 
         elif mdef['type'] == 'upsample':
-            modules = nn.Upsample(scale_factor=int(mdef['stride']), mode='nearest')
+            modules = nn.Upsample(scale_factor=int(
+                mdef['stride']), mode='nearest')
 
         elif mdef['type'] == 'route':  # nn.Sequential() placeholder for 'route' layer
             layers = [int(x) for x in mdef['layers'].split(',')]
-            filters = sum([output_filters[i + 1 if i > 0 else i] for i in layers])
+            filters = sum([output_filters[i + 1 if i > 0 else i]
+                           for i in layers])
             routs.extend([l if l > 0 else l + i for l in layers])
             # if mdef[i+1]['type'] == 'reorg3d':
             #     modules = nn.Upsample(scale_factor=1/float(mdef[i+1]['stride']), mode='nearest')  # reorg3d
@@ -84,14 +90,18 @@ def create_modules(module_defs, img_size, arc):
                     b = [0, -8.5]
                 elif arc == 'uCE':  # unified CE (1 background + 80 classes)
                     b = [10, -0.1]
-                elif arc == 'Fdefault':  # Focal default no pw (28 cls, 21 obj, no pw)
+                # Focal default no pw (28 cls, 21 obj, no pw)
+                elif arc == 'Fdefault':
                     b = [-2.1, -1.8]
-                elif arc == 'uFBCE' or arc == 'uFBCEpw':  # unified FocalBCE (5120 obj, 80 classes)
+                # unified FocalBCE (5120 obj, 80 classes)
+                elif arc == 'uFBCE' or arc == 'uFBCEpw':
                     b = [0, -6.5]
-                elif arc == 'uFCE':  # unified FocalCE (64 cls, 1 background + 80 classes)
+                # unified FocalCE (64 cls, 1 background + 80 classes)
+                elif arc == 'uFCE':
                     b = [7.7, -1.1]
 
-                bias = module_list[-1][0].bias.view(len(mask), -1)  # 255 to 3x85
+                # 255 to 3x85
+                bias = module_list[-1][0].bias.view(len(mask), -1)
                 bias[:, 4] += b[0] - bias[:, 4].mean()  # obj
                 bias[:, 5:] += b[1] - bias[:, 5:].mean()  # cls
                 # bias = torch.load('weights/yolov3-spp.bias.pt')[yolo_index]  # list of tensors [3x85, 3x85, 3x85]
@@ -135,7 +145,8 @@ class YOLOLayer(nn.Module):
             create_grids(self, img_size, (nx, ny), p.device, p.dtype)
 
         # p.view(bs, 255, 13, 13) -- > (bs, 3, 13, 13, 85)  # (bs, anchors, grid, grid, classes + xywh)
-        p = p.view(bs, self.na, self.nc + 5, self.ny, self.nx).permute(0, 1, 3, 4, 2).contiguous()  # prediction
+        p = p.view(bs, self.na, self.nc + 5, self.ny,
+                   self.nx).permute(0, 1, 3, 4, 2).contiguous()  # prediction
 
         if self.training:
             return p
@@ -144,7 +155,8 @@ class YOLOLayer(nn.Module):
             # s = 1.5  # scale_xy  (pxy = pxy * s - (s - 1) / 2)
             io = p.clone()  # inference output
             io[..., 0:2] = torch.sigmoid(io[..., 0:2]) + self.grid_xy  # xy
-            io[..., 2:4] = torch.exp(io[..., 2:4]) * self.anchor_wh  # wh yolo method
+            io[..., 2:4] = torch.exp(io[..., 2:4]) * \
+                self.anchor_wh  # wh yolo method
             # io[..., 2:4] = ((torch.sigmoid(io[..., 2:4]) * 2) ** 3) * self.anchor_wh  # wh power method
             io[..., :4] *= self.stride
 
@@ -158,7 +170,8 @@ class YOLOLayer(nn.Module):
                 io[..., 4] = 1
 
             if self.nc == 1:
-                io[..., 5] = 1  # single-class model https://github.com/ultralytics/yolov3/issues/235
+                # single-class model https://github.com/ultralytics/yolov3/issues/235
+                io[..., 5] = 1
 
             # reshape from [1, 3, 13, 13, 85] to [1, 507, 85]
             return io.view(bs, -1, 5 + self.nc), p
@@ -171,12 +184,15 @@ class Darknet(nn.Module):
         super(Darknet, self).__init__()
 
         self.module_defs = parse_model_cfg(cfg)
-        self.module_list, self.routs = create_modules(self.module_defs, img_size, arc)
+        self.module_list, self.routs = create_modules(
+            self.module_defs, img_size, arc)
         self.yolo_layers = get_yolo_layers(self)
 
         # Darknet Header https://github.com/AlexeyAB/darknet/issues/2914#issuecomment-496675346
-        self.version = np.array([0, 2, 5], dtype=np.int32)  # (int32) version info: major, minor, revision
-        self.seen = np.array([0], dtype=np.int64)  # (int64) number of images seen during training
+        # (int32) version info: major, minor, revision
+        self.version = np.array([0, 2, 5], dtype=np.int32)
+        # (int64) number of images seen during training
+        self.seen = np.array([0], dtype=np.int64)
 
     def forward(self, x, var=None):
         img_size = x.shape[-2:]
@@ -195,7 +211,8 @@ class Darknet(nn.Module):
                     try:
                         x = torch.cat([layer_outputs[i] for i in layers], 1)
                     except:  # apply stride 2 for darknet reorg layer
-                        layer_outputs[layers[1]] = F.interpolate(layer_outputs[layers[1]], scale_factor=[0.5, 0.5])
+                        layer_outputs[layers[1]] = F.interpolate(
+                            layer_outputs[layers[1]], scale_factor=[0.5, 0.5])
                         x = torch.cat([layer_outputs[i] for i in layers], 1)
                     # print(''), [print(layer_outputs[i].shape) for i in layers], print(x.shape)
             elif mtype == 'shortcut':
@@ -229,7 +246,8 @@ class Darknet(nn.Module):
 
 
 def get_yolo_layers(model):
-    return [i for i, x in enumerate(model.module_defs) if x['type'] == 'yolo']  # [82, 94, 106] for yolov3
+    # [82, 94, 106] for yolov3
+    return [i for i, x in enumerate(model.module_defs) if x['type'] == 'yolo']
 
 
 def create_grids(self, img_size=416, ng=(13, 13), device='cpu', type=torch.float32):
@@ -239,11 +257,13 @@ def create_grids(self, img_size=416, ng=(13, 13), device='cpu', type=torch.float
 
     # build xy offsets
     yv, xv = torch.meshgrid([torch.arange(ny), torch.arange(nx)])
-    self.grid_xy = torch.stack((xv, yv), 2).to(device).type(type).view((1, 1, ny, nx, 2))
+    self.grid_xy = torch.stack((xv, yv), 2).to(
+        device).type(type).view((1, 1, ny, nx, 2))
 
     # build wh gains
     self.anchor_vec = self.anchors.to(device) / self.stride
-    self.anchor_wh = self.anchor_vec.view(1, self.na, 1, 1, 2).to(device).type(type)
+    self.anchor_wh = self.anchor_vec.view(
+        1, self.na, 1, 1, 2).to(device).type(type)
     self.ng = torch.Tensor(ng).to(device)
     self.nx = nx
     self.ny = ny
@@ -262,8 +282,10 @@ def load_darknet_weights(self, weights, cutoff=-1):
     # Read weights file
     with open(weights, 'rb') as f:
         # Read Header https://github.com/AlexeyAB/darknet/issues/2914#issuecomment-496675346
-        self.version = np.fromfile(f, dtype=np.int32, count=3)  # (int32) version info: major, minor, revision
-        self.seen = np.fromfile(f, dtype=np.int64, count=1)  # (int64) number of images seen during training
+        # (int32) version info: major, minor, revision
+        self.version = np.fromfile(f, dtype=np.int32, count=3)
+        # (int64) number of images seen during training
+        self.seen = np.fromfile(f, dtype=np.int64, count=1)
 
         weights = np.fromfile(f, dtype=np.float32)  # The rest are weights
 
@@ -276,118 +298,37 @@ def load_darknet_weights(self, weights, cutoff=-1):
                 bn_layer = module[1]
                 num_b = bn_layer.bias.numel()  # Number of biases
                 # Bias
-                bn_b = torch.from_numpy(weights[ptr:ptr + num_b]).view_as(bn_layer.bias)
+                bn_b = torch.from_numpy(
+                    weights[ptr:ptr + num_b]).view_as(bn_layer.bias)
                 bn_layer.bias.data.copy_(bn_b)
                 ptr += num_b
                 # Weight
-                bn_w = torch.from_numpy(weights[ptr:ptr + num_b]).view_as(bn_layer.weight)
+                bn_w = torch.from_numpy(
+                    weights[ptr:ptr + num_b]).view_as(bn_layer.weight)
                 bn_layer.weight.data.copy_(bn_w)
                 ptr += num_b
                 # Running Mean
-                bn_rm = torch.from_numpy(weights[ptr:ptr + num_b]).view_as(bn_layer.running_mean)
+                bn_rm = torch.from_numpy(
+                    weights[ptr:ptr + num_b]).view_as(bn_layer.running_mean)
                 bn_layer.running_mean.data.copy_(bn_rm)
                 ptr += num_b
                 # Running Var
-                bn_rv = torch.from_numpy(weights[ptr:ptr + num_b]).view_as(bn_layer.running_var)
+                bn_rv = torch.from_numpy(
+                    weights[ptr:ptr + num_b]).view_as(bn_layer.running_var)
                 bn_layer.running_var.data.copy_(bn_rv)
                 ptr += num_b
             else:
                 # Load conv. bias
                 num_b = conv_layer.bias.numel()
-                conv_b = torch.from_numpy(weights[ptr:ptr + num_b]).view_as(conv_layer.bias)
+                conv_b = torch.from_numpy(
+                    weights[ptr:ptr + num_b]).view_as(conv_layer.bias)
                 conv_layer.bias.data.copy_(conv_b)
                 ptr += num_b
             # Load conv. weights
             num_w = conv_layer.weight.numel()
-            conv_w = torch.from_numpy(weights[ptr:ptr + num_w]).view_as(conv_layer.weight)
+            conv_w = torch.from_numpy(
+                weights[ptr:ptr + num_w]).view_as(conv_layer.weight)
             conv_layer.weight.data.copy_(conv_w)
             ptr += num_w
 
     return cutoff
-
-
-def save_weights(self, path='model.weights', cutoff=-1):
-    # Converts a PyTorch model to Darket format (*.pt to *.weights)
-    # Note: Does not work if model.fuse() is applied
-    with open(path, 'wb') as f:
-        # Write Header https://github.com/AlexeyAB/darknet/issues/2914#issuecomment-496675346
-        self.version.tofile(f)  # (int32) version info: major, minor, revision
-        self.seen.tofile(f)  # (int64) number of images seen during training
-
-        # Iterate through layers
-        for i, (mdef, module) in enumerate(zip(self.module_defs[:cutoff], self.module_list[:cutoff])):
-            if mdef['type'] == 'convolutional':
-                conv_layer = module[0]
-                # If batch norm, load bn first
-                if mdef['batch_normalize']:
-                    bn_layer = module[1]
-                    bn_layer.bias.data.cpu().numpy().tofile(f)
-                    bn_layer.weight.data.cpu().numpy().tofile(f)
-                    bn_layer.running_mean.data.cpu().numpy().tofile(f)
-                    bn_layer.running_var.data.cpu().numpy().tofile(f)
-                # Load conv bias
-                else:
-                    conv_layer.bias.data.cpu().numpy().tofile(f)
-                # Load conv weights
-                conv_layer.weight.data.cpu().numpy().tofile(f)
-
-
-def convert(cfg='cfg/yolov3-spp.cfg', weights='weights/yolov3-spp.weights'):
-    # Converts between PyTorch and Darknet format per extension (i.e. *.weights convert to *.pt and vice versa)
-    # from models import *; convert('cfg/yolov3-spp.cfg', 'weights/yolov3-spp.weights')
-
-    # Initialize model
-    model = Darknet(cfg)
-
-    # Load weights and save
-    if weights.endswith('.pt'):  # if PyTorch format
-        model.load_state_dict(torch.load(weights, map_location='cpu')['model'])
-        save_weights(model, path='converted.weights', cutoff=-1)
-        print("Success: converted '%s' to 'converted.weights'" % weights)
-
-    elif weights.endswith('.weights'):  # darknet format
-        _ = load_darknet_weights(model, weights)
-
-        chkpt = {'epoch': -1,
-                 'best_fitness': None,
-                 'training_results': None,
-                 'model': model.state_dict(),
-                 'optimizer': None}
-
-        torch.save(chkpt, 'converted.pt')
-        print("Success: converted '%s' to 'converted.pt'" % weights)
-
-    else:
-        print('Error: extension not supported.')
-
-
-def attempt_download(weights):
-    # Attempt to download pretrained weights if not found locally
-
-    msg = weights + ' missing, download from https://drive.google.com/drive/folders/1uxgUBemJVw9wZsdpboYbzUN4bcRhsuAI'
-    if weights and not os.path.isfile(weights):
-        file = Path(weights).name
-
-        if file == 'yolov3-spp.weights':
-            gdrive_download(id='1oPCHKsM2JpM-zgyepQciGli9X0MTsJCO', name=weights)
-        elif file == 'yolov3-spp.pt':
-            gdrive_download(id='1vFlbJ_dXPvtwaLLOu-twnjK4exdFiQ73', name=weights)
-        elif file == 'yolov3.pt':
-            gdrive_download(id='11uy0ybbOXA2hc-NJkJbbbkDwNX1QZDlz', name=weights)
-        elif file == 'yolov3-tiny.pt':
-            gdrive_download(id='1qKSgejNeNczgNNiCn9ZF_o55GFk1DjY_', name=weights)
-        elif file == 'darknet53.conv.74':
-            gdrive_download(id='18xqvs_uwAqfTXp-LJCYLYNHBOcrwbrp0', name=weights)
-        elif file == 'yolov3-tiny.conv.15':
-            gdrive_download(id='140PnSedCsGGgu3rOD6Ez4oI6cdDzerLC', name=weights)
-
-        else:
-            try:  # download from pjreddie.com
-                url = 'https://pjreddie.com/media/files/' + file
-                print('Downloading ' + url)
-                os.system('curl -f ' + url + ' -o ' + weights)
-            except IOError:
-                print(msg)
-                os.system('rm ' + weights)  # remove partial downloads
-
-        assert os.path.exists(weights), msg  # download missing weights from Google Drive

@@ -1,4 +1,3 @@
-from timeit import default_timer as timer
 import argparse
 
 from flask import Flask, request, jsonify
@@ -18,25 +17,36 @@ app = Flask(__name__)
 def get_pred():
     """
     POST /
+
     Params:
         images (list): List of data uri specified images.
+
     Returns:
         Prediction in list of object, each object specifies the the two corners of the bounding box, the confidence level and the prediction.
     """
+    # get image list
+    if 'images' in request.json:
+        images = request.json['images']
+    else:
+        return jsonify([])
 
-    start = timer()
-    images = request.json['images']
-    images = list(map(lambda b: DataURI(b), images))  # convert to datauri
-    # filter only image
+    # Convert strings to DataURI
+    images = list(map(lambda b: DataURI(b), images))
+
+    # Filter out non-images
     images = list(filter(lambda uri: uri.mimetype[:5] == 'image', images))
+
+    # Early return if no images are in list
     if len(images) == 0:
         return jsonify([])
+
+    # Decode DataURI into np.ndarray
     images = list(map(lambda uri: cv2.imdecode(np.frombuffer(
-        uri.data, np.uint8), -1), images))  # convert to images
+        uri.data, np.uint8), -1), images))
+
+    # Detect object in images
     with torch.no_grad():
         json = detect(images)
-    end = timer()
-    print('Process took {:.2f}s to finish.'.format(end-start))
 
     return jsonify(json)
 

@@ -35,6 +35,7 @@ COPY ./data ./data
 COPY ./utils ./utils
 COPY detect.py .
 COPY models.py .
+COPY config.py .
 COPY server.py .
 
 # Set ownership
@@ -52,8 +53,3 @@ ENV upstream_url="http://127.0.0.1:3000"
 HEALTHCHECK --interval=5s CMD [ -e /tmp/.lock ] || exit 1
 
 CMD ["fwatchdog"]
-
-
-# Start Server
-# EXPOSE 3000
-# CMD ["gunicorn", "-b", "0.0.0.0:3000", "server:app"]
