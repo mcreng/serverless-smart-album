@@ -10,5 +10,5 @@ Pillow
 pandas
 flask
 python-datauri
-gunicorn
+gevent
 # pycocotools # install seperately.. otherwise pip crashes because it doesn't link Cython and numpy as its dependencies

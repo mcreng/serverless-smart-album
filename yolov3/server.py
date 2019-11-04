@@ -1,8 +1,8 @@
 from timeit import default_timer as timer
 import argparse
 
-import flask
-from flask import request, send_file, jsonify
+from flask import Flask, request, jsonify
+from gevent.pywsgi import WSGIServer
 
 import cv2
 import numpy as np
@@ -11,12 +11,13 @@ import torch
 from datauri import DataURI
 from detect import detect
 
-app = flask.Flask(__name__)
+app = Flask(__name__)
 
-@app.route('/', methods=['GET'])
+
+@app.route('/', methods=['POST'])
 def get_pred():
     """
-    Get /
+    POST /
     Params:
         images (list): List of data uri specified images.
     Returns:
@@ -41,4 +42,5 @@ def get_pred():
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=3000)
+    http_server = WSGIServer(('', 3000), app)
+    http_server.serve_forever()
