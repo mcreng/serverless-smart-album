@@ -5,6 +5,7 @@
   "dependencies": {
     "react": "^16.11.0",
     "react-dom": "^16.11.0",
+    "react-image-mapper": "0.0.15",
     "react-scripts": "0.9.5"
   },
   "devDependencies": {},
@@ -14,5 +15,5 @@
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject"
   },
-  "proxy": "http://localhost:31112"
+  "proxy": "http://127.0.0.1:31112"
 }
