@@ -1,0 +1,19 @@
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+service:
+  type: ClusterIP
+  port: 80
+
+openfaas:
+  functionNamespace: serverless-fn
+
+postgresql:
+  postgresqlDatabase: serverless
+  postgresqlUsername: root
+  postgresqlPassword: admin

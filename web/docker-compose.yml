@@ -1,0 +1,8 @@
+version: '2'
+services:
+  serverless-web:
+    build: ./
+    image: serverless/serverless-web
+    ports:
+      - 80:80
+    container_name: serverless-web

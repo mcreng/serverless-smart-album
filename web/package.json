@@ -8,7 +8,9 @@
     "react-image-mapper": "0.0.15",
     "react-scripts": "0.9.5"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "styled-components": "^4.4.1"
+  },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",

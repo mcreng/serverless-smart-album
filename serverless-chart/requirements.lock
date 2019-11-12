@@ -1,0 +1,12 @@
+dependencies:
+- name: postgresql
+  repository: https://kubernetes-charts.storage.googleapis.com/
+  version: 6.5.3
+- name: openfaas
+  repository: https://openfaas.github.io/faas-netes/
+  version: 5.2.2
+- name: redis
+  repository: https://kubernetes-charts.storage.googleapis.com/
+  version: 9.5.3
+digest: sha256:f77f027255348f0e85ffe759171f12cf9a7bc596fe08da394bc1430bc6d7922f
+generated: "2019-11-12T15:45:09.827615444+08:00"

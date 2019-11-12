@@ -1,0 +1,10 @@
+dependencies:
+  - name: postgresql
+    version: 6.5.3
+    repository: https://kubernetes-charts.storage.googleapis.com/
+  - name: openfaas
+    version: 5.2.2
+    repository: https://openfaas.github.io/faas-netes/
+  - name: redis
+    version: 9.5.3
+    repository: https://kubernetes-charts.storage.googleapis.com/
