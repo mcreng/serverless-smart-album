@@ -8,6 +8,6 @@ functions:
     handler: ./yolov3
     image: mcreng/yolov3:latest
   thumbor:
-    lang: node
+    lang: dockerfile
     handler: ./thumbor
     image: dipsywong98/thumbor:latest
