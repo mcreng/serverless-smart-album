@@ -7,3 +7,9 @@ functions:
     lang: dockerfile
     handler: ./yolov3
     image: mcreng/yolov3:latest
+  recognition-web:
+    lang: node10-express
+    handler: ./web
+    image: dipsywong98/recognition-web:lastest
+    labels:
+      com.openfaas.scale.zero: false
