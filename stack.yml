@@ -8,7 +8,7 @@ functions:
     handler: ./yolov3
     image: mcreng/yolov3:latest
   recognition-web:
-    lang: node10-express
+    lang: node10-express:latest
     handler: ./web
     image: dipsywong98/recognition-web:lastest
     labels:
