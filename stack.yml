@@ -6,10 +6,10 @@ functions:
   yolov3:
     lang: dockerfile
     handler: ./yolov3
-    image: yolov3:latest
+    image: localhost:32000/yolov3:latest
   recognition-web:
     lang: node10-express
     handler: ./web
-    image: recognition-web:lastest
+    image: localhost:32000/recognition-web:latest
     labels:
       com.openfaas.scale.zero: false
