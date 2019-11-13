@@ -4,6 +4,41 @@ This is a project submission to HKUST COMP 4651 Cloud Computing. In this project
 
 ![](https://raw.githubusercontent.com/aws-samples/lambda-refarch-imagerecognition/master/images/photo-processing-backend-diagram.png)
 
+## Web
+This is the user interface for the whole system, implemented in react and hosted as a function in OpenFaas
+
+The web is built and deploy by
+
+```shell script
+# pull the required custom template
+faas template pull https://github.com/openfaas-incubator/node10-express-template
+
+# build react static site
+cd web/client
+npm i
+npm run build
+
+# deploy to OpenFaas
+cd ../..
+sudo faas-cli build --filter "recognition-web"
+sudo faas-cli deploy --filter "recognition-web"
+```
+
+For development
+
+The development server will proxy all request to OpenFaas server (see `web/client/package.json` proxy field)
+
+```shell script
+cd web/client
+
+# install dependency
+npm i
+
+# start development server
+npm run start
+```
+
+
 ## Yolov3
 
 This acts as the `Amazon Rekognition` module in the system. The model is dockerised and may be built and deployed by:
@@ -85,4 +120,4 @@ The model would then return something like:
 
 Sample data uris for testing can be found in `./yolov3/data/samples/*.b64`.
 
-This module can also be deployed to `OpenFaaS` by doing `faas-cli up` at root folder.
+This module can also be deployed to `OpenFaaS` by doing `faas-cli deploy` at root folder.
