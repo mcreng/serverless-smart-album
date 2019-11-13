@@ -20,7 +20,8 @@ npm run build
 
 # deploy to OpenFaas
 cd ../..
-sudo faas-cli up -f web.yml
+sudo faas-cli build --filter "recognition-web"
+sudo faas-cli deploy --filter "recognition-web"
 ```
 
 For development

@@ -1,15 +1,15 @@
 version: 1.0
 provider:
   name: openfaas
-  gateway: http://127.0.0.1:8080
+  gateway: http://127.0.0.1:31112
 functions:
   yolov3:
     lang: dockerfile
     handler: ./yolov3
-    image: mcreng/yolov3:latest
+    image: yolov3:latest
   recognition-web:
-    lang: node10-express:latest
+    lang: node10-express
     handler: ./web
-    image: dipsywong98/recognition-web:lastest
+    image: recognition-web:lastest
     labels:
       com.openfaas.scale.zero: false
