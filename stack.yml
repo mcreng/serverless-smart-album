@@ -13,3 +13,8 @@ functions:
     image: localhost:32000/recognition-web:latest
     labels:
       com.openfaas.scale.zero: false
+  albums:
+    lang: node10-express
+    handler: ./albums
+    image: localhost:32000/albums:latest
+
