@@ -8,7 +8,7 @@ functions:
     handler: ./yolov3
     image: localhost:32000/yolov3:latest
   recognition-web:
-    lang: node10-express
+    lang: dockerfile
     handler: ./web
     image: localhost:32000/recognition-web:latest
     labels:
