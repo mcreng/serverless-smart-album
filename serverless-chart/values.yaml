@@ -1,0 +1,4 @@
+postgresql:
+  postgresqlDatabase: serverless
+  postgresqlUsername: root
+  postgresqlPassword: admin
