@@ -1,4 +1,4 @@
-postgresql:
-  postgresqlDatabase: serverless
-  postgresqlUsername: root
-  postgresqlPassword: admin
+mongodb:
+  mongodbDatabase: serverless
+  mongodbUsername: root
+  mongodbPassword: admin

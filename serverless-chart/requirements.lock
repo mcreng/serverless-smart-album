@@ -1,9 +1,9 @@
 dependencies:
-- name: postgresql
+- name: mongodb
   repository: https://kubernetes-charts.storage.googleapis.com/
-  version: 6.5.3
+  version: 7.4.4
 - name: redis
   repository: https://kubernetes-charts.storage.googleapis.com/
   version: 9.5.3
-digest: sha256:2793def4cf4e2d2321eae6499802b4e556d52d141669335b06b8822730be48c9
-generated: "2019-11-14T14:40:50.006325254+08:00"
+digest: sha256:c05930586b5fea4b7f5f900350df37cd3b09858e5fa2bed9ff1a25982beabfec
+generated: "2019-11-14T21:31:39.932999351+08:00"
