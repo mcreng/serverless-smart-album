@@ -1,1 +1,0 @@
-const thumbnail = require('./handler')
