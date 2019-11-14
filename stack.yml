@@ -13,3 +13,7 @@ functions:
     image: localhost:32000/recognition-web:latest
     labels:
       com.openfaas.scale.zero: false
+  thumbnail:
+    lang: node
+    handler: ./thumbnail
+    image: localhost:32000/thumbnail:latest
