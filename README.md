@@ -38,7 +38,7 @@ This acts as the `Amazon Rekognition` module in the system. The model is dockeri
 
 The module exposes the port `3000` that accepts a `POST` request with a `json` body like:
 
-```json
+```javascript
 {
   "images": [
     "data:image/jpg;base64,/9j/4AAQSkZJRgABAQAASABIAAD/4Qh8RXhpZg...",
