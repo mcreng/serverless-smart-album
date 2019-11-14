@@ -1,15 +1,3 @@
-securityContext: {}
-  # capabilities:
-  #   drop:
-  #   - ALL
-  # readOnlyRootFilesystem: true
-  # runAsNonRoot: true
-  # runAsUser: 1000
-
-service:
-  type: ClusterIP
-  port: 80
-
 postgresql:
   postgresqlDatabase: serverless
   postgresqlUsername: root
