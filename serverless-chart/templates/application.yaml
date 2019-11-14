@@ -1,34 +1,34 @@
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: {{ template "serverless-chart.fullname" . }}-deployment
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: {{ template "serverless-chart.fullname" . }}-serverless
-  template:
-    metadata:
-      labels:
-        app: {{ template "serverless-chart.fullname" . }}-serverless
-    spec:
-      containers:
-        - name: {{ template "serverless-chart.fullname" . }}-serverless
-          image: serverless/serverless-web
-          env: []
-          # - name:
-          #   value:
+{{/*apiVersion: apps/v1*/}}
+{{/*kind: Deployment*/}}
+{{/*metadata:*/}}
+{{/*  name: {{ template "serverless-chart.fullname" . }}-deployment*/}}
+{{/*spec:*/}}
+{{/*  replicas: 1*/}}
+{{/*  selector:*/}}
+{{/*    matchLabels:*/}}
+{{/*      app: {{ template "serverless-chart.fullname" . }}-serverless*/}}
+{{/*  template:*/}}
+{{/*    metadata:*/}}
+{{/*      labels:*/}}
+{{/*        app: {{ template "serverless-chart.fullname" . }}-serverless*/}}
+{{/*    spec:*/}}
+{{/*      containers:*/}}
+{{/*        - name: {{ template "serverless-chart.fullname" . }}-serverless*/}}
+{{/*          image: serverless/serverless-web*/}}
+{{/*          env: []*/}}
+{{/*          # - name:*/}}
+{{/*          #   value:*/}}
 
----
+{{/*---*/}}
 
-apiVersion: v1
-kind: Service
-metadata:
-  name: {{ template "serverless-chart.fullname" . }}-service
-spec:
-  type: {{ .Values.service.type }}
-  selector:
-    app: {{ template "serverless-chart.fullname" . }}-serverless
-  ports:
-    - port: {{ .Values.service.port }}
-      targetPort: http
+{{/*apiVersion: v1*/}}
+{{/*kind: Service*/}}
+{{/*metadata:*/}}
+{{/*  name: {{ template "serverless-chart.fullname" . }}-service*/}}
+{{/*spec:*/}}
+{{/*  type: {{ .Values.service.type }}*/}}
+{{/*  selector:*/}}
+{{/*    app: {{ template "serverless-chart.fullname" . }}-serverless*/}}
+{{/*  ports:*/}}
+{{/*    - port: {{ .Values.service.port }}*/}}
+{{/*      targetPort: http*/}}

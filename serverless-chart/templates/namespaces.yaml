@@ -6,12 +6,12 @@
 {{/*    role: openfaas-system*/}}
 {{/*    access: openfaas-system*/}}
 {{/*    istio-injection: enabled*/}}
----
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: {{ .Values.openfaas.functionNamespace | quote }}
-  labels:
-    istio-injection: enabled
-    role: {{ .Values.openfaas.functionNamespace | quote }}
+{{/*---*/}}
+{{/*apiVersion: v1*/}}
+{{/*kind: Namespace*/}}
+{{/*metadata:*/}}
+{{/*  name: {{ .Values.openfaas.functionNamespace | quote }}*/}}
+{{/*  labels:*/}}
+{{/*    istio-injection: enabled*/}}
+{{/*    role: {{ .Values.openfaas.functionNamespace | quote }}*/}}
 

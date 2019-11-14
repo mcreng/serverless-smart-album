@@ -20,4 +20,14 @@ This will dry run the installation strategy. This is more complete than simply r
 helm install --dry-run --debug --namespace serverless .
 ```
 
-If everything is 
+If everything is fine, install using this command in this directory.
+
+```sh
+helm install --namespace serverless .
+```
+
+Remember the release name and remove the release using:
+
+```sh
+helm delete <release-name>
+```
