@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # shellcheck disable=SC2046
 
-DIR=$(dirname $0)
+DIR=$(dirname "$0")
 
 ## Load dotenv values
 #export $(egrep -v '^#' "${DIR}/../.env" | xargs)
@@ -18,9 +18,13 @@ DIR=$(dirname $0)
 #  exit 1
 #fi
 
+echo "Building dependency charts..."
+
+helm dep build "${DIR}/../serverless-chart"
+
 echo "Setting up Helm chart..."
 
 helm install --namespace openfaas-fn --name serverless \
+  "${DIR}/../serverless-chart"
 #  --set mongodb.mongodbUsername=root \
 #  --set mongodb.mongodbPassword=admin \
-  "${DIR}/../serverless-chart"
