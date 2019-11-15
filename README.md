@@ -4,10 +4,33 @@ This is a project submission to HKUST COMP 4651 Cloud Computing. In this project
 
 ![](https://raw.githubusercontent.com/aws-samples/lambda-refarch-imagerecognition/master/images/photo-processing-backend-diagram.png)
 
+## Thumbnail
+This is a thumbnail generator implemented in nodejs, using dockerfile to host express, the core is smartcropjs, which need canvas to polyfill a browser environment to have smartcropjs functional properly.
+
+The thumbnail is build and deployed by
+
+```shell script
+faas-cli up --filter "thumbnail"
+```
+
+please pay attention that thumbnail takes a while (5min) to build since the canvas module is quite large
+
+(lang dockerfile is used instead of node since using canvas module requires both python and node)
+
+For development
+
+```shell script
+cd thumbnail
+
+npm i
+
+npm run dev
+```
+
 ## Web
 This is the user interface for the whole system, implemented in react and hosted as a function in OpenFaas
 
-The web is built and deploy by
+The web is built and deployed by
 
 ```shell script
 faas-cli up --filter "recognition-web"
