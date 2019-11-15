@@ -14,6 +14,6 @@ functions:
     labels:
       com.openfaas.scale.zero: false
   thumbnail:
-    lang: node
+    lang: dockerfile
     handler: ./thumbnail
     image: localhost:32000/thumbnail:latest
