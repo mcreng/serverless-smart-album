@@ -17,3 +17,7 @@ functions:
     lang: dockerfile
     handler: ./thumbnail
     image: localhost:32000/thumbnail:latest
+  albums:
+    lang: node10-express
+    handler: ./albums
+    image: localhost:32000/albums:latest
