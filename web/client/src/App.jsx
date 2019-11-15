@@ -5,6 +5,7 @@ import ImageViewer from './ImageViewer'
 
 export default () => {
   const [dataURL, setDataURL] = useState('')
+  const [thumbnailDataURL, setThumbnailDataURL] = useState('')
   const [areas, setAreas] = useState([])
   const onFileSelect = ({ target: { files } }) => {
     const reader = new FileReader()
@@ -20,6 +21,12 @@ export default () => {
         })
       }).then(res => res.json()).then(json => {
         setAreas(json[0])
+      })
+      fetch('/function/thumbnail', {
+        method: 'POST',
+        body: reader.result
+      }).then(res => res.text()).then(text => {
+        setThumbnailDataURL(text)
       })
     }, false)
 
@@ -39,6 +46,7 @@ export default () => {
       <TestFassButton/>
       <input type="file" onChange={onFileSelect}/>
       {dataURL && <ImageViewer src={dataURL} areas={areas}/>}
+      {thumbnailDataURL && <img src={thumbnailDataURL}/>}
     </div>
   )
 }
