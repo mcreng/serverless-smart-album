@@ -19,14 +19,7 @@ USER root
 
 COPY . .
 
-#RUN npm i
-#RUN apk add --no-cache --virtual .gyp \
-#        python \
-#        make \
-#        g++
-RUN which python
 RUN npm install
-#RUN apk del .gyp
 
 # Copy Files
 USER app
