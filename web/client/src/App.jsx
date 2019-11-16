@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import './App.css'
 import TestFassButton from './TestFassButton'
 import ImageViewer from './ImageViewer'
+import axios from 'axios'
 
 export default () => {
   const [dataURL, setDataURL] = useState('')
@@ -35,6 +36,47 @@ export default () => {
     }
   }
 
+  const [fileSelected, setFileSelected] = useState(null)
+  const [albumId, setAlbumId] = useState('defaultAlbum')
+  const [userName, setUserName] = useState('defaultUser')
+
+  const generateKey = () => {
+    return ("" + new Date().getTime()).split("").reverse().join("")
+      + "-" + albumId
+      + "-" + fileSelected.name;
+  }
+
+  const readFile = async file => new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = () => resolve(reader.result)
+    reader.onerror = () => reject()
+    reader.readAsDataURL(file)
+  })
+
+  const onImageSelect = ({ target: { files } }) => setFileSelected(files[0] || null)
+
+  const upload = async () => {
+    if (!fileSelected) {
+      return
+    }
+
+    // Upload to storage and run chained functions
+    // This is not mirroring AWS example, where they simply uploaded file to bucket and triggers a
+    // backend event to initiate chained functions.
+    const data = await readFile(fileSelected)
+    try {
+      await axios.post('/function/photos', {
+        albumId,
+        userName,
+        data,
+        name: fileSelected.name
+      })
+      console.log('uploaded')
+    } catch (e) {
+      alert(e)
+    }
+  }
+
   return (
     <div className="App">
       <div className="App-header">
@@ -47,6 +89,10 @@ export default () => {
       <input type="file" onChange={onFileSelect}/>
       {dataURL && <ImageViewer src={dataURL} areas={areas}/>}
       {thumbnailDataURL && <img src={thumbnailDataURL}/>}
+      <hr/>
+      <label>Test process upload</label>
+      <input type="file" onChange={onImageSelect}/>
+      <button type="button" onClick={upload}>Upload</button>
     </div>
   )
 }

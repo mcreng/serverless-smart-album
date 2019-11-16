@@ -2,3 +2,5 @@ mongodb:
   mongodbDatabase: serverless
   mongodbUsername: root
   mongodbPassword: admin
+redis:
+  password: admin

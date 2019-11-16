@@ -21,3 +21,12 @@ functions:
     lang: node10-express
     handler: ./albums
     image: localhost:32000/albums:latest
+  photos:
+    lang: node10-express
+    handler: ./photos
+    image: localhost:32000/photos:latest
+  storage:
+    lang: node10-express
+    handler: ./storage
+    image: localhost:32000/storage:latest
+

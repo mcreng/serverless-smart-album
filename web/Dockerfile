@@ -18,20 +18,11 @@ ENV PATH=$PATH:/home/app/.local/bin
 WORKDIR /home/app
 
 USER root
+COPY --chown=app:app . .
 
-COPY . .
+USER app
 RUN npm i
-RUN cd client && npm i
-RUN cd client && npm run build
-
-# Copy Files
-USER app
-
-# Set ownership
-USER root
-RUN chown -R app:app ./
-
-USER app
+RUN cd client && npm i && npm run build
 
 # Start server
 ENV fprocess="node server.js"
