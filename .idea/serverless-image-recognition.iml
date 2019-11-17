@@ -7,5 +7,6 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="@types/mongodb" level="application" />
+    <orderEntry type="library" name="@types/redis" level="application" />
   </component>
 </module>
