@@ -33,7 +33,7 @@ const ClassBox = ({ area }) => {
 export default ({ src, areas }) => {
   return (
     <Relative>
-      <img src={src}/>
+      <img className="img-fluid" src={src}/>
       {areas.map((area) => <ClassBox area={area}/>)}
     </Relative>
   )
