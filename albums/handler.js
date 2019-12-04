@@ -22,10 +22,13 @@ const index = () => connect(async (context, db, close) => {
 })
 
 const show = albumId => connect(async (context, db, close) => {
+  const albums = db.collection('albums')
+  const resultingAlbum = await albums.findOne({ _id: albumId })
   const photos = db.collection('photos')
+  resultingAlbum.photos = await photos.find({albumId}).toArray()
   context
     .status(200)
-    .succeed(await photos.find({albumId}).toArray())
+    .succeed(resultingAlbum)
   close()
 })
 
@@ -33,6 +36,7 @@ const store = ({ albumName, userName }) => connect(async (context, db, close) =>
   const albums = db.collection('albums')
   try {
     const result = await albums.insertOne({albumName, userName, createdAt: Date.now()})
+    result.photos = []
     context.status(201).succeed({ insertedCount: result.insertedCount })
   } catch (e) {
     context.status(500).fail('Mongo Err:' + e)
