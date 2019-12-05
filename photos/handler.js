@@ -3,17 +3,20 @@
 const MongoClient = require('mongodb').MongoClient
 
 const connect = cb => context => {
-  MongoClient.connect('mongodb://root:admin@serverless-mongodb.openfaas-fn:27017/?authMechanism=DEFAULT&authSource=serverless', function (err, client) {
+  MongoClient.connect('mongodb://root:admin@serverless-mongodb.openfaas-fn:27017/?authMechanism=DEFAULT&authSource=serverless', {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+  }, function (err, client) {
     if (err) {
       context
         .status(500)
         .fail('MongoDB Err: ' + err)
     }
-    cb(context, client.db('serverless'), client.close)
+    cb(context, client.db('serverless'))
   });
 }
 
-const show = _id => connect(async (context, db, close) => {
+const show = _id => connect(async (context, db) => {
   const photos = db.collection('photos')
   try {
     const photo = await photos.findOne({ _id })
@@ -21,7 +24,6 @@ const show = _id => connect(async (context, db, close) => {
       context
         .status(200)
         .succeed(photo)
-      close()
     } else {
       context.status(404).fail('Not Found')
     }
@@ -30,14 +32,13 @@ const show = _id => connect(async (context, db, close) => {
   }
 })
 
-const store = ({ albumId, userName, key }) => connect(async (context, db, close) => {
+const store = ({ albumId, userName, key }) => connect(async (context, db) => {
   const photos = db.collection('photos')
   try {
     // Insert to database
     // TODO check existence of album with albumId
     const result = await photos.insertOne({ albumId, userName, key, createdAt: Date.now() })
     context.status(201).succeed(result.ops[0])
-    close()
   } catch (e) {
     context.status(500).fail('Err:' + e)
   }

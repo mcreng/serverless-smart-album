@@ -7,28 +7,33 @@ export default ({ setScene, setSharedData, sharedData }) => {
   const photos = sharedData.album.photos || []
   const [renderedPhotos, setRenderedPhotos] = useState([]);
 
-  useEffect(async () => {
-    setRenderedPhotos(await Promise.all(photos.map(async ({ key, createdAt, tags=[] }) => {
-      const data = (await axios.get('/function/storage/' + key)).data
+  useEffect(() => {
+    let isSubscribed = true;
+    (async () => {
+      const renderedPhotos = await Promise.all(photos.map(async ({ key, createdAt, tags=[] }) => {
+        const data = (await axios.get('/function/storage/' + key)).data
 
-      return (
-        <div className="card">
-          <div className="card-body">
-            <img className="img-fluid" src={data} alt={key}/>
-            <div>
-              <strong>Tags:</strong>
-              { tags.map(name => <span className="badge badge-primary">{ name }</span>) }
-            </div>
-            <div>
-              <strong>Upload date:</strong>
-              {(new Date(createdAt)).toLocaleString()}
+        return (
+          <div className="card m-2" key={key}>
+            <div className="card-body">
+              <img className="img-fluid" src={data} alt={key}/>
+              <div>
+                <strong>Tags: </strong>
+                { tags.map(name => <span className="badge badge-primary">{ name }</span>) }
+              </div>
+              <div>
+                <strong>Upload date: </strong>
+                {(new Date(createdAt)).toLocaleString()}
+              </div>
             </div>
           </div>
-        </div>
-      )
-    })))
-
-    return () => {}
+        )
+      }))
+      if (isSubscribed) {
+        setRenderedPhotos(renderedPhotos)
+      }
+    })()
+    return () => isSubscribed = false
   }, [sharedData])
 
   return (
@@ -39,8 +44,10 @@ export default ({ setScene, setSharedData, sharedData }) => {
           <UploadPhoto setSharedData={setSharedData} sharedData={sharedData}/>
         </div>
       </div>
-      <div className="my-4 row row-cols-2 row-cols-md-3 row-cols-lg-4">
-        { renderedPhotos }
+      <div className="container-fluid">
+        <div className="my-4 row row-cols-2 row-cols-md-3 row-cols-lg-4">
+          { renderedPhotos }
+        </div>
       </div>
     </div>
   )
