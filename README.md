@@ -63,11 +63,12 @@ The module exposes the port `3000` that accepts a `POST` request with a `json` b
 
 ```javascript
 {
-  "images": [
-    "data:image/jpg;base64,/9j/4AAQSkZJRgABAQAASABIAAD/4Qh8RXhpZg...",
-    "data:image/jpg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAMCAg...",
+  {"images": [ // these are IDs from redis
+    "incoming:0164608455751-5de8ee343f0191000c80c507-bus.jpg", 
+    "incoming:9264771555751-5de8ee343f0191000c80c507-zidane.jpg",
     // ...
-  ]
+    ]
+  }
 }
 ```
 
