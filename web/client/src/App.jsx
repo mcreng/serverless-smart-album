@@ -34,11 +34,11 @@ export default () => {
           </span>
           {sharedData.userName &&
             <Fragment>
-              <div>
+              <ul className="navbar-nav">
                 <li className="nav-item">
                   <a className="nav-link" href="#" onClick={showAlbums}>Albums</a>
                 </li>
-              </div>
+              </ul>
               <div className="ml-auto">
                 <span className="navbar-text">Welcome, {sharedData.userName}!</span>
               </div>
@@ -46,7 +46,7 @@ export default () => {
           }
         </div>
       </header>
-      <main className="container">
+      <main>
         {scene === 'login' && <Login onLogin={onLogin}/>}
         {scene === 'albums' && <Albums setScene={setScene} setSharedData={setSharedData} sharedData={sharedData}/>}
         {scene === 'album' && <Album setScene={setScene} setSharedData={setSharedData} sharedData={sharedData}/>}

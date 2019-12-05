@@ -37,10 +37,9 @@ const store = ({ albumId, userName, key }) => connect(async (context, db, close)
     // TODO check existence of album with albumId
     const result = await photos.insertOne({ albumId, userName, key, createdAt: Date.now() })
     context.status(201).succeed(result.ops[0])
+    close()
   } catch (e) {
     context.status(500).fail('Err:' + e)
-  } finally {
-    close()
   }
 
   // TODO 3. Check MIME type

@@ -16,7 +16,7 @@ export default ({ onLogin }) => {
   }
 
   return (
-    <div className="flex-fill d-flex flex-column">
+    <div className="flex-fill d-flex flex-column container">
       <div className="flex-fill"/>
       <div className="card">
         <div className="card-body">

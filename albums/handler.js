@@ -1,6 +1,7 @@
 'use strict'
 
 const MongoClient = require('mongodb').MongoClient
+const ObjectId = require('mongodb').ObjectId
 
 const connect = cb => context => {
   MongoClient.connect('mongodb://root:admin@serverless-mongodb.openfaas-fn:27017/?authMechanism=DEFAULT&authSource=serverless', function (err, client) {
@@ -23,7 +24,7 @@ const index = () => connect(async (context, db, close) => {
 
 const show = albumId => connect(async (context, db, close) => {
   const albums = db.collection('albums')
-  const resultingAlbum = await albums.findOne({ _id: albumId })
+  const resultingAlbum = await albums.findOne({ _id: new ObjectId(albumId) })
   const photos = db.collection('photos')
   resultingAlbum.photos = await photos.find({albumId}).toArray()
   context
@@ -38,10 +39,9 @@ const store = ({ albumName, userName }) => connect(async (context, db, close) =>
     const result = await albums.insertOne({albumName, userName, createdAt: Date.now()})
     result.photos = []
     context.status(201).succeed(result.ops[0])
+    close()
   } catch (e) {
     context.status(500).fail('Mongo Err:' + e)
-  } finally {
-    close()
   }
 })
 
