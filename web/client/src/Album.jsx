@@ -7,7 +7,7 @@ export default ({ setScene, setSharedData, sharedData }) => {
   const photos = sharedData.album.photos || []
 
   const renderedPhotos = photos.map(async ({ key, createdAt, tags=[] }) => {
-    const data = await axios.get('/function/storage/' + key).data
+    const data = (await axios.get('/function/storage/' + key)).data
 
     return (
       <div className="card">

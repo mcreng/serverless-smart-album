@@ -22,8 +22,7 @@ export default ({ onLogin }) => {
         <div className="card-body">
           <h2>Login</h2>
           <div className="form-group">
-            <label htmlFor="login">UserName</label>
-            <input type="text" className="form-control" id="login" onChange={handleUserNameChange}/>
+            <input type="text" className="form-control" onChange={handleUserNameChange} placeholder="User Name"/>
           </div>
           <div className="form-group">
             <button type="button" className="btn btn-primary" onClick={login}>Login</button>
