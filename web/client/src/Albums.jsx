@@ -49,7 +49,7 @@ export default ({ setScene, setSharedData, sharedData }) => {
   ))
 
   return (
-    <div className="mt-4">
+    <div className="mt-4 container">
       <h1>Albums</h1>
       <div className="input-group mb-3">
         <input type="text" className="form-control" placeholder="New Album Name" onChange={e => setNewAlbumName(e.target.value)}/>

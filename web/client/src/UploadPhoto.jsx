@@ -2,7 +2,7 @@ import React, {useState} from 'react'
 import ImageViewer from './ImageViewer'
 import axios from 'axios'
 
-export default ({ albumId, userName }) => {
+export default ({ setSharedData, sharedData }) => {
   const [dataURL, setDataURL] = useState('')
   const [thumbnailDataURL, setThumbnailDataURL] = useState('')
   const [areas, setAreas] = useState([])
@@ -38,7 +38,7 @@ export default ({ albumId, userName }) => {
 
   const generateKey = () => {
     return ("" + new Date().getTime()).split("").reverse().join("")
-      + "-" + albumId
+      + "-" + sharedData.album._id
       + "-" + fileSelected.name;
   }
 
@@ -63,10 +63,19 @@ export default ({ albumId, userName }) => {
     try {
       const key = generateKey()
       await axios.post('/function/storage/incoming:' + key, {data})
-      await axios.post('/function/photos', {
-        albumId,
-        userName,
+      const photo = (await axios.post('/function/photos', {
+        albumId: sharedData.album._id,
+        userName: sharedData.userName,
         key: 'incoming:' + key
+      })).data
+      setSharedData({
+        album: {
+          ...sharedData.album,
+          photos: [
+            ...sharedData.album.photos,
+            photo
+          ]
+        }
       })
       console.log('uploaded')
     } catch (e) {
@@ -78,11 +87,13 @@ export default ({ albumId, userName }) => {
     <div>
       <input type="file" onChange={onFileSelect}/>
       {dataURL && <ImageViewer src={dataURL} areas={areas}/>}
-      {thumbnailDataURL && <img src={thumbnailDataURL}/>}
+      {thumbnailDataURL && <img src={thumbnailDataURL} alt="Thumbnail"/>}
       <hr/>
-      <label>Test process upload</label>
-      <input type="file" onChange={onImageSelect}/>
-      <button type="button" onClick={upload}>Upload</button>
+      <div className="form-inline">
+        <label className="mr-2">Upload photo</label>
+        <input type="file" onChange={onImageSelect}/>
+        <button type="button" className="btn btn-primary" onClick={upload}>Upload</button>
+      </div>
     </div>
   )
 }
