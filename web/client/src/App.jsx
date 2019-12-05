@@ -65,11 +65,12 @@ export default () => {
     // backend event to initiate chained functions.
     const data = await readFile(fileSelected)
     try {
+      const key = generateKey()
+      await axios.post('/function/storage/incoming:' + key, { data })
       await axios.post('/function/photos', {
         albumId,
         userName,
-        data,
-        name: fileSelected.name
+        key: 'incoming:' + key
       })
       console.log('uploaded')
     } catch (e) {

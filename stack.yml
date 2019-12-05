@@ -26,7 +26,7 @@ functions:
     handler: ./photos
     image: localhost:32000/photos:latest
   storage:
-    lang: node10-express
+    lang: dockerfile
     handler: ./storage
     image: localhost:32000/storage:latest
 

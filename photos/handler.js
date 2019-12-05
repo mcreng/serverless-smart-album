@@ -1,13 +1,6 @@
 'use strict'
 
 const MongoClient = require('mongodb').MongoClient
-const axios = require('axios')
-
-const generateKey = (albumId, name) => {
-  return ("" + new Date().getTime()).split("").reverse().join("")
-    + "-" + albumId
-    + "-" + name;
-}
 
 const connect = cb => context => {
   MongoClient.connect('mongodb://root:admin@serverless-mongodb.openfaas-fn:27017/?authMechanism=DEFAULT&authSource=serverless', function (err, client) {
@@ -37,13 +30,10 @@ const show = _id => connect(async (context, db, close) => {
   }
 })
 
-const store = ({ albumId, userName, data, name }) => connect(async (context, db, close) => {
+const store = ({ albumId, userName, key }) => connect(async (context, db, close) => {
   const photos = db.collection('photos')
-  const key = generateKey(albumId, name)
   try {
-    // 1. Upload to redis first
-    await axios.post('http://gateway.openfaas:8080/function/storage/incoming:' + key, { data })
-    // 2. Insert to database
+    // Insert to database
     // TODO check existence of album with albumId
     const result = await photos.insertOne({ albumId, userName, incomingKey: key, createdAt: Date.now() })
     context.status(201).succeed(result.ops[0])
