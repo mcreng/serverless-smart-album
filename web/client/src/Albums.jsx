@@ -9,12 +9,11 @@ export default ({ setScene, setSharedData, sharedData }) => {
     const albumName = newAlbumName.trim()
     if (albumName !== '') {
       try {
-        const album = await axios.post('/function/albums', {
+        const album = (await axios.post('/function/albums', {
           userName: sharedData.userName,
           albumName
-        }).data
+        })).data
         setSharedData({
-          ...sharedData,
           album
         })
         setScene('album')
@@ -24,11 +23,10 @@ export default ({ setScene, setSharedData, sharedData }) => {
     }
   }
 
-  const selectAlbum = () => async albumId => {
+  const selectAlbum = albumId => async () => {
     try {
-      const album = await axios.get('/function/albums/' + albumId).data
+      const album = (await axios.get('/function/albums/' + albumId)).data
       setSharedData({
-        ...sharedData,
         album
       })
       setScene('album')
@@ -39,7 +37,7 @@ export default ({ setScene, setSharedData, sharedData }) => {
 
   const renderedAlbums = sharedData.albums.map(({_id, albumName, userName}) => (
     <div className="col mb-4">
-      <a href="#" onClick={selectAlbum}>
+      <a href="#" onClick={selectAlbum(_id)}>
         <div className="card">
           <div className="card-body">
             <h5 className="card-title">{albumName}</h5>

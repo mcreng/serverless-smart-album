@@ -1,4 +1,4 @@
-import React, {Fragment, useState} from 'react'
+import React, {Fragment, useState, useReducer} from 'react'
 import Login from './Login'
 import Albums from './Albums'
 import Album from './Album'
@@ -6,19 +6,20 @@ import axios from 'axios'
 
 export default () => {
   const [scene, setScene] = useState('login')
-  const [sharedData, setSharedData] = useState({})
+  const [sharedData, setSharedData] = useReducer((state, data) => ({
+    ...state,
+    ...data
+  }), {})
 
   const showAlbums = async () => {
     setSharedData({
-      ...sharedData,
-      albums: await axios.get('/function/albums').data
+      albums: (await axios.get('/function/albums')).data
     })
     setScene('albums')
   }
 
   const onLogin = (userName) => {
     setSharedData({
-      ...sharedData,
       userName
     })
     showAlbums()

@@ -37,7 +37,7 @@ const store = ({ albumName, userName }) => connect(async (context, db, close) =>
   try {
     const result = await albums.insertOne({albumName, userName, createdAt: Date.now()})
     result.photos = []
-    context.status(201).succeed({ insertedCount: result.insertedCount })
+    context.status(201).succeed(result.ops[0])
   } catch (e) {
     context.status(500).fail('Mongo Err:' + e)
   } finally {
