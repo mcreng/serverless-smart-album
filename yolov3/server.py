@@ -21,7 +21,7 @@ def get_pred():
     POST /
 
     Params:
-        images (list): List of IDs to points to images in Redis.
+        images (list): List of IDs that points to images in redis.
 
     Returns:
         Prediction in list of object, each object specifies the the two corners of the bounding box, the confidence level and the prediction.
@@ -32,7 +32,7 @@ def get_pred():
     else:
         return jsonify([])
 
-    # Convert keys to DataURI through redis
+    # Convert keys to DataURIs through redis
     images = list(map(lambda s: r.get(s).decode(), images))
 
     # Convert strings to DataURIs
