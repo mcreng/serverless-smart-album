@@ -36,7 +36,7 @@ export default ({ setScene, setSharedData, sharedData }) => {
   }
 
   const renderedAlbums = sharedData.albums.map(({_id, albumName, userName}) => (
-    <div className="col mb-4">
+    <div className="col mb-4" key={_id}>
       <a href="#" onClick={selectAlbum(_id)}>
         <div className="card">
           <div className="card-body">

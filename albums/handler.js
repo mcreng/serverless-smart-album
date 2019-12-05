@@ -4,25 +4,27 @@ const MongoClient = require('mongodb').MongoClient
 const ObjectId = require('mongodb').ObjectId
 
 const connect = cb => context => {
-  MongoClient.connect('mongodb://root:admin@serverless-mongodb.openfaas-fn:27017/?authMechanism=DEFAULT&authSource=serverless', function (err, client) {
+  MongoClient.connect('mongodb://root:admin@serverless-mongodb.openfaas-fn:27017/?authMechanism=DEFAULT&authSource=serverless', {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+  }, function (err, client) {
     if (err) {
       context
         .status(500)
         .fail('MongoDB Err: ' + err)
     }
-    cb(context, client.db('serverless'), client.close)
+    cb(context, client.db('serverless'))
   });
 }
 
-const index = () => connect(async (context, db, close) => {
+const index = () => connect(async (context, db) => {
   const albums = db.collection('albums')
   context
     .status(200)
     .succeed(await albums.find({}).toArray())
-  close()
 })
 
-const show = albumId => connect(async (context, db, close) => {
+const show = albumId => connect(async (context, db) => {
   const albums = db.collection('albums')
   const resultingAlbum = await albums.findOne({ _id: new ObjectId(albumId) })
   const photos = db.collection('photos')
@@ -30,16 +32,14 @@ const show = albumId => connect(async (context, db, close) => {
   context
     .status(200)
     .succeed(resultingAlbum)
-  close()
 })
 
-const store = ({ albumName, userName }) => connect(async (context, db, close) => {
+const store = ({ albumName, userName }) => connect(async (context, db) => {
   const albums = db.collection('albums')
   try {
     const result = await albums.insertOne({albumName, userName, createdAt: Date.now()})
-    result.photos = []
+    result.ops[0].photos = []
     context.status(201).succeed(result.ops[0])
-    close()
   } catch (e) {
     context.status(500).fail('Mongo Err:' + e)
   }
