@@ -11,4 +11,5 @@ pandas
 flask
 python-datauri
 gevent
+redis
 # pycocotools # install seperately.. otherwise pip crashes because it doesn't link Cython and numpy as its dependencies
