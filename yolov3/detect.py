@@ -66,12 +66,15 @@ def detect(images):
                 det[:, :4] = scale_coords(
                     img.shape[2:], det[:, :4], im0s.shape).round()
 
-        # Convert prediction output to dictionary
-        df = pd.DataFrame \
-            .from_records(pred[0].numpy(), columns=['x1', 'y1', 'x2', 'y2', 'conf', 'unk', 'class']) \
-            .drop(columns=['unk']) \
-            .astype(dtype={'x1': 'int', 'y1': 'int', 'x2': 'int', 'y2': 'int'})
-        df['class'] = df['class'].map(lambda c: classes[int(c)])
-        preds.append(df.to_dict(orient='records'))
+        if pred[0] is not None:
+            # Convert prediction output to dictionary
+            df = pd.DataFrame \
+                .from_records(pred[0].numpy(), columns=['x1', 'y1', 'x2', 'y2', 'conf', 'unk', 'class']) \
+                .drop(columns=['unk']) \
+                .astype(dtype={'x1': 'int', 'y1': 'int', 'x2': 'int', 'y2': 'int'})
+            df['class'] = df['class'].map(lambda c: classes[int(c)])
+            preds.append(df.to_dict(orient='records'))
+        else:
+            preds.append([])
 
     return preds
