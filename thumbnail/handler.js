@@ -39,16 +39,22 @@ const dataUrlHandler = (dataURL, callback) => {
 }
 
 const redisHandler = (key, callback) => {
-  axios.get('http://127.0.0.1:31112/function/storage/'+key).then(({data: dataURL})=>{
+  const imageName = key.split(":")[1]
+  const thumbKey = 'thumbnail:' + imageName
+  axios.get('http://gateway.openfaas:8080/function/storage/'+key).then(({data: dataURL})=>{
     // console.log(result)
     console.log(dataURL.slice(0,10))
-    dataUrlHandler(dataURL,callback)
+    dataUrlHandler(dataURL,( result, status ) => {
+      axios.post('http://gateway.openfaas:8080/function/storage/'+thumbKey, { data: result }).then(() => {
+        callback(thumbKey, status)
+      })
+    })
   })
 }
 
 // https://gist.github.com/bgrins/6194623
 const isDataURL = s => !!s.match(isDataURL.regex)
-isDataURL.regex = /^\s*data:([a-z]+\/[a-z]+(;[a-z\-]+\=[a-z\-]+)?)?(;base64)?,[a-z0-9\!\$\&\'\,\(\)\*\+\,\;\=\-\.\_\~\:\@\/\?\%\s]*\s*$/i
+isDataURL.regex = /^\s*data:([a-z]+\/[a-z]+(;[a-z\-]+=[a-z\-]+)?)?(;base64)?,[a-z0-9!$&',()*+;=\-._~:@\/?%\s]*\s*$/i
 
 const isRedisURL = s => true
 

@@ -18,14 +18,14 @@ export default ({ onLogin }) => {
   return (
     <div className="flex-fill d-flex flex-column container">
       <div className="flex-fill"/>
-      <div className="card">
-        <div className="card-body">
-          <h2>Login</h2>
-          <div className="form-group">
-            <input type="text" className="form-control" onChange={handleUserNameChange} placeholder="User Name"/>
-          </div>
-          <div className="form-group">
-            <button type="button" className="btn btn-primary" onClick={login}>Login</button>
+      <div className="row">
+        <div className="card col-12 col-md-6 offset-md-3">
+          <div className="card-body">
+            <h2 className="mb-4">Login</h2>
+            <div className="form-inline mb-2">
+              <input type="text" className="form-control flex-fill" onChange={handleUserNameChange} placeholder="User Name"/>
+              <button type="button" className="btn btn-primary ml-2" onClick={login}>Login</button>
+            </div>
           </div>
         </div>
       </div>

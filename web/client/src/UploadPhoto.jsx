@@ -1,39 +1,7 @@
 import React, {useState} from 'react'
-import ImageViewer from './ImageViewer'
 import axios from 'axios'
 
 export default ({ setSharedData, sharedData }) => {
-  const [dataURL, setDataURL] = useState('')
-  const [thumbnailDataURL, setThumbnailDataURL] = useState('')
-  const [areas, setAreas] = useState([])
-  const onFileSelect = ({target: {files}}) => {
-    const reader = new FileReader()
-    reader.addEventListener('load', function () {
-      setDataURL(reader.result)
-      fetch('/function/yolov3', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          images: [reader.result]
-        })
-      }).then(res => res.json()).then(json => {
-        setAreas(json[0])
-      })
-      fetch('/function/thumbnail', {
-        method: 'POST',
-        body: reader.result
-      }).then(res => res.text()).then(text => {
-        setThumbnailDataURL(text)
-      })
-    }, false)
-
-    if (files.length > 0) {
-      reader.readAsDataURL(files[0])
-    }
-  }
-
   const [fileSelected, setFileSelected] = useState(null)
 
   const generateKey = () => {
@@ -85,10 +53,6 @@ export default ({ setSharedData, sharedData }) => {
 
   return (
     <div>
-      <input type="file" onChange={onFileSelect}/>
-      {dataURL && <ImageViewer src={dataURL} areas={areas}/>}
-      {thumbnailDataURL && <img src={thumbnailDataURL} alt="Thumbnail"/>}
-      <hr/>
       <div className="form-inline">
         <label className="mr-2">Upload photo</label>
         <input type="file" onChange={onImageSelect}/>

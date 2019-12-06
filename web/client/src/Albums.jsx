@@ -50,8 +50,8 @@ export default ({ setScene, setSharedData, sharedData }) => {
 
   return (
     <div className="mt-4 container">
-      <h1>Albums</h1>
-      <div className="input-group mb-3">
+      <h1 className="mb-3">Albums</h1>
+      <div className="input-group mb-4">
         <input type="text" className="form-control" placeholder="New Album Name" onChange={e => setNewAlbumName(e.target.value)}/>
         <div className="input-group-append">
           <button className="btn btn-secondary" type="button" onClick={newAlbum}>New Album</button>

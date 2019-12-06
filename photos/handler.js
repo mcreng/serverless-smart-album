@@ -1,6 +1,7 @@
 'use strict'
 
 const MongoClient = require('mongodb').MongoClient
+const axios = require('axios')
 
 const connect = cb => context => {
   MongoClient.connect('mongodb://root:admin@serverless-mongodb.openfaas-fn:27017/?authMechanism=DEFAULT&authSource=serverless', {
@@ -35,16 +36,21 @@ const show = _id => connect(async (context, db) => {
 const store = ({ albumId, userName, key }) => connect(async (context, db) => {
   const photos = db.collection('photos')
   try {
+    // Run thumbnail
+    const thumbnailKey = (await axios.post('http://gateway.openfaas:8080/function/thumbnail', key, {
+      headers: { 'Content-Type': 'text/plain' }
+    })).data
+
+    // Run model
+    const classifications = (await axios.post('http://gateway.openfaas:8080/function/yolov3', { images: [ key ] })).data
+    const tags = [...new Set(classifications[0].map(result => result['class']))]
+
     // Insert to database
-    // TODO check existence of album with albumId
-    const result = await photos.insertOne({ albumId, userName, key, createdAt: Date.now() })
-    context.status(201).succeed(result.ops[0])
+    const photo = await photos.insertOne({ albumId, userName, key, thumbnailKey, tags, createdAt: Date.now() })
+    context.status(201).succeed(photo.ops[0])
   } catch (e) {
     context.status(500).fail('Err:' + e)
   }
-
-  // TODO 3. Check MIME type
-  // 4. If OK, run model
 })
 
 module.exports = (event, context) => {
