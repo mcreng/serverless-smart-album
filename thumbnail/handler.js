@@ -63,7 +63,7 @@ const handler = (context, callback) => {
     if (isDataURL(context)) {
       return dataUrlHandler(context, callback)
     } else if (isRedisURL(context)) {
-      return redisHandler(context, callback)
+      return redisHandler(decodeURI(context), callback)
     }
   }
   callback('Incorrect input', { status: 'error' })
