@@ -47,7 +47,7 @@ def get_pred():
 
     # Decode DataURI into np.ndarray
     images = list(map(lambda uri: cv2.imdecode(np.frombuffer(
-        uri.data, np.uint8), -1), images))
+        uri.data, np.uint8), -1)[:,:,:3], images))
 
     # Detect object in images
     with torch.no_grad():
