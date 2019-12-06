@@ -28,9 +28,9 @@ module.exports = (event, context) => {
   context.headers({ 'Content-Type': 'application/json' })
 
   if (path.length === 1 && event.method === 'GET') {
-    show(path[0])(context)
+    show(decodeURI(path[0]))(context)
   } else if (path.length === 1 && event.method === 'POST') {
-    store(path[0], event.body.data)(context)
+    store(decodeURI(path[0]), event.body.data)(context)
   } else {
     context
       .status(400)
