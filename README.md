@@ -1,44 +1,38 @@
 # Serverless Image Detection System
 
+## Introduction
+
 This is a project submission to HKUST COMP 4651 Cloud Computing. In this project, we aim to re-implement the [AWS Image Recognition Example](https://github.com/aws-samples/lambda-refarch-imagerecognition).
 
 ![](https://raw.githubusercontent.com/aws-samples/lambda-refarch-imagerecognition/master/images/photo-processing-backend-diagram.png)
 
-## Thumbnail
-This is a thumbnail generator implemented in nodejs, using dockerfile to host express, the core is smartcropjs, which need canvas to polyfill a browser environment to have smartcropjs functional properly.
+Please view our report `report.pdf` for more information.
 
-The thumbnail is build and deployed by
+## Setup
 
-```shell script
-faas-cli up --filter "thumbnail"
-```
+This project is easily deployable to Kubernetes clusters.
 
-please pay attention that thumbnail takes a while (5min) to build since the canvas module is quite large
+1. Install OpenFaaS, if not present.
+2. Setup a local docker repository, if not present. Change the repository host in `stack.yml` accordingly. Default if `localhost:32000`.
+3. Setup the necessary helm services by `sh ./scripts/helm-up.sh`.
+4. Deploy the functions by `faas-cli up`.
 
-(lang dockerfile is used instead of node since using canvas module requires both python and node)
+## Removal
 
-For development
+This project is easily removable as well.
 
-```shell script
-cd thumbnail
+1. Remove the deployed functions by `faas-cli rm`.
+2. Remove the helm services by `sh ./scripts/helm-down.sh`.
+3. (Optional) Remove the local docker repository.
+4. (Optional) Remove OpenFaaS.
 
-npm i
+## Modules Implemented
 
-npm run dev
-```
+### Web
 
-## Web
-This is the user interface for the whole system, implemented in react and hosted as a function in OpenFaas
+This function renders a static single page web application using React, interfacing with the user, allowing users to manage albums and photos. Requests are sent to other functions for processing via AJAX.
 
-The web is built and deployed by
-
-```shell script
-faas-cli up --filter "recognition-web"
-```
-
-For development
-
-The development server will proxy all request to OpenFaas server (see `web/client/package.json` proxy field)
+The web UI may be developed by:
 
 ```shell script
 cd web/client
@@ -50,10 +44,51 @@ npm i
 npm run start
 ```
 
+The development server will proxy all request to the OpenFaaS server (see `web/client/package.json` proxy field).
 
-## Yolov3
+### Storage
 
-This acts as the `Amazon Rekognition` module in the system. The model is dockerised and may be built and deployed by:
+This mirrors the AWS S3 service to allow users to upload and retrieve data in a key-value pair manner. This is implemented using a Redis instance. This function exposes a REST API endpoint:
+
+- Show: Retrieve a value using a key from Redis
+
+- Store: Update a key-value pair to Redis
+
+### Albums
+
+This function allows users to manage albums. This function exposes a REST API endpoint:
+
+- Index: List all albums
+
+- Show: Display details of one album by the album ID
+
+- Store: Create a new album
+
+### Photos
+
+This function allows users to manage photos. This function exposes a REST API endpoint:
+
+- Show: Display details of one photo by its ID
+
+- Store: Create a new photo
+
+### Thumbnail
+
+This is a thumbnail generator function implemented using Nodejs smartcropjs library. To obtain a thumbnail, POST request the function with application/text header with a Redis key to the image or image Data URI as body, then the function returns a Redis key to the thumbnail or thumbnail Data URI respectively.
+
+This may be developed by
+
+```shell script
+cd thumbnail
+
+npm i
+
+npm run dev
+```
+
+### Yolov3
+
+This acts as the `Amazon Rekognition` module in the system. The model is dockerised and may be developed locally by:
 
 1. `cd yolov3/`
 2. `docker build -t yolo .`
@@ -64,7 +99,7 @@ The module exposes the port `3000` that accepts a `POST` request with a `json` b
 ```javascript
 {
   "images": [ // these are IDs from redis
-    "incoming:0164608455751-5de8ee343f0191000c80c507-bus.jpg", 
+    "incoming:0164608455751-5de8ee343f0191000c80c507-bus.jpg",
     "incoming:9264771555751-5de8ee343f0191000c80c507-zidane.jpg",
     // ...
    ]
@@ -131,5 +166,3 @@ The model would then return something like:
 ```
 
 Sample data uris for testing can be found in `./yolov3/data/samples/*.b64`.
-
-This module can also be deployed to `OpenFaaS` by doing `faas-cli up` at root folder.
