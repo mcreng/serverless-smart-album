@@ -7,13 +7,4 @@ npm i
 npm start
 ```
 
-## Production in Docker(WIP)
-
-```sh
-# building the image
-docker build -t recognition-web .
-
-# run the image
-docker run -it -p 8080:80 recognition-web
-```
-
+Notice that in the development server, all request to the development server (default `localhost:3000`) are proxied to `http://127.0.0.1:31112`, in order to prevent CORS issues. You may refer to `client/package.json` and official react docs.
