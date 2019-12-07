@@ -1,4 +1,4 @@
-# Serverless Image Detection System
+# Serverless Smart Album
 
 ## Introduction
 
